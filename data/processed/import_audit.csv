@@ -1,0 +1,9 @@
+dataset,rows,columns,unique_players,duplicate_id_rows,season_in_file
+arm_strength,395,27,395,0,2025
+arm_value,118,21,118,0,2025
+jump,92,12,92,0,2025
+oaa,110,16,110,0,2025
+sprint_speed,579,10,579,0,not encoded
+lf,235,25,235,0,not encoded
+cf,179,25,179,0,not encoded
+rf,230,25,230,0,not encoded

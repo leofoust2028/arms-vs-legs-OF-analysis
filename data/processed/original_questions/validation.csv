@@ -1,0 +1,6 @@
+check,status
+Position variance identity,PASS
+Fixed-sample full-rank held-out fits,PASS
+Previous arm RMSE reproduced,PASS
+Arm components reconcile,PASS
+Player tradeoff arithmetic,PASS

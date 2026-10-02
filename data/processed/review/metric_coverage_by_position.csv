@@ -1,0 +1,25 @@
+position_group,metric,players,available,missing
+CF,arm_runs,80,32,48
+CF,arm_strength_arm_of,80,53,27
+CF,arm_strength_arm_overall,80,60,20
+CF,jump_rel_league_bootup_distance,80,30,50
+CF,range_runs,80,35,45
+CF,sprint_speed_sprint_speed,80,65,15
+LF,arm_runs,94,29,65
+LF,arm_strength_arm_of,94,47,47
+LF,arm_strength_arm_overall,94,60,34
+LF,jump_rel_league_bootup_distance,94,23,71
+LF,range_runs,94,24,70
+LF,sprint_speed_sprint_speed,94,84,10
+Multi-position OF,arm_runs,56,20,36
+Multi-position OF,arm_strength_arm_of,56,36,20
+Multi-position OF,arm_strength_arm_overall,56,40,16
+Multi-position OF,jump_rel_league_bootup_distance,56,15,41
+Multi-position OF,range_runs,56,19,37
+Multi-position OF,sprint_speed_sprint_speed,56,52,4
+RF,arm_runs,105,37,68
+RF,arm_strength_arm_of,105,60,45
+RF,arm_strength_arm_overall,105,71,34
+RF,jump_rel_league_bootup_distance,105,24,81
+RF,range_runs,105,32,73
+RF,sprint_speed_sprint_speed,105,94,11

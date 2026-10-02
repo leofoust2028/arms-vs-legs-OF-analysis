@@ -1,0 +1,19 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+.DS_Store
+reports/*_files/
+reports/*.knit.md
+reports/*.utf8.md
+.Renviron
+.env
+.env.*
+!.env.example
+*.log
+# Local collaboration context; public methods are documented separately.
+docs/project_context.md
+
+# Personal study notes stay on this computer.
+reports/project_walkthrough*
+docs/learning_guide.md

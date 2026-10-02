@@ -1,0 +1,6 @@
+dataset,source_players,matched_to_roster,source_players_outside_roster,positive_inning_players_without_source
+arm_strength,395,232,163,104
+arm_value,118,118,0,217
+jump,92,92,0,243
+oaa,110,110,0,225
+sprint_speed,579,296,283,40

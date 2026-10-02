@@ -1,0 +1,5 @@
+metric,players,minimum,q25,median,q75,maximum
+arm_strength_total_throws_of,231,0,60.5,129,274,534
+arm_value_n_opp_xb,118,116,162.5,236,305.25,458
+jump_n,92,33,44.75,58.5,67.25,100
+sprint_speed_competitive_runs,295,10,38.5,84,164,291

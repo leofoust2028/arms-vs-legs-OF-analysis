@@ -1,0 +1,336 @@
+---
+title: "Arm or Legs? Outfield Range and Throwing Value"
+author: "Leo Foust"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    self_contained: true
+    theme: readable
+    mathjax: null
+---
+
+```{r setup, include=FALSE}
+# reading in the saved results and setting up the report
+knitr::opts_chunk$set(echo=FALSE,message=FALSE,warning=FALSE,fig.width=9,fig.height=5)
+library(tidyverse)
+read_table <- function(path) read_csv(file.path('data/processed',path),show_col_types=FALSE)
+models <- read_table('models/model_comparison.csv')
+components <- read_table('jump_components/model_comparison.csv')
+attempts <- read_table('runner_attempts/model_comparison.csv')
+odds <- read_table('runner_attempts/arm_odds_ratio.csv')
+samples <- read_table('samples/sample_counts.csv')
+disp <- read_table('models/component_dispersion.csv')
+unc <- read_table('final/dispersion_uncertainty.csv')
+sensitivity <- read_table('sensitivity/model_scores.csv')
+include_plot <- function(path) knitr::include_graphics(normalizePath(path),rel_path=FALSE)
+num <- function(x) formatC(x,format='f',digits=2)
+```
+
+<style>
+table {display:block; overflow-x:auto; font-size:13px;}
+th {white-space:normal;}
+img {max-width:100%; height:auto;}
+body {line-height:1.65;}
+</style>
+
+# Main takeaways
+
+In this saved 2025 sample, **range runs vary more between players than throwing
+runs**, overall and within primary-position groups. Jump and Burst carry more
+information about range value than sprint speed in the fitted models. OF arm
+strength adds some information about throwing value. Evidence that it materially
+improves prediction of runner attempts is weak.
+
+The question here is about what happened in this saved season. When I say one
+component “matters more,” I am looking at how much it separates the players in
+these measurements. That is different from proving how much a training program
+would help or predicting next season. The analysis also keeps track of how range
+and arm values vary together, rather than turning them into percentages of each
+player's total.
+
+## Important audit correction
+
+The original Arm Strength export lacked a year column and did **not** match the
+official 2025 leaderboard. Early versions of the throwing analyses used it.
+Those throwing results are superseded. The current pipeline uses
+`arm_strength_2025_verified.csv`, extracted from records explicitly tagged 2025.
+The original file remains unchanged for provenance. This report and current CSV
+outputs are the authoritative results; historical discussion summaries are not.
+
+# Where the data came from
+
+The data come from five Statcast exports and three FanGraphs files for positional
+innings. The code joins players by ID because names can be written differently.
+It converts baseball innings into outs before adding them and leaves missing
+measurements as missing. If a player is absent from a positional innings file,
+that is treated as zero innings at that position, based on how the files were
+collected. Records with no outfield innings stay in the data checks but are not
+used in the analysis.
+
+A player needs at least 60% of his outfield innings at one position to receive
+that position label. Otherwise, he is in the multi-position group. Each question
+uses the available players, but competing models within that question always use
+the same group.
+
+```{r sampletable}
+# showing the number of players used for each question
+knitr::kable(samples |> filter(sample %in% c('range_speed_and_components','arm_value_of_strength','deterrence_of_strength','range_vs_arm','range_vs_arm_by_position')) |> select(sample,included),col.names=c('Analysis availability','Players'))
+```
+
+Run `source("run_all.R")` from the RStudio project or `Rscript --vanilla run_all.R`
+from its directory. The pipeline checks SHA-256 hashes before and after, runs
+each script in a separate environment, saves generated outputs and records R and
+package versions. It installs nothing and needs no network access for reruns.
+Recorded versions describe the successful environment; they are not a dependency lockfile.
+
+## Source verification
+
+On 2026-10-01, the official 2025 qualified OAA roster matched all 110 saved players,
+with qualification flags and identical range runs. The qualified Arm Value roster
+matched all 118 players and opportunity counts. Arm run values had small revisions
+(maximum absolute difference 0.0713 runs); the analysis preserves the original
+snapshot. Sprint Speed's 579 players, displayed speeds and competitive-run counts
+matched the official 2025 page. Arm Strength was replaced as described above.
+
+Jump's counts satisfy its published rule under the stated full-season assumption.
+FanGraphs year provenance rests on the original collection context and filenames;
+the files have no season column. Matching modern snapshots cannot reconstruct
+all historical filters. The numerical Arm Value qualification formula remains
+undocumented in the inspected public interface; matching its qualified roster
+provides membership evidence without inventing that formula.
+
+# Range: speed or movement?
+
+Every range model includes outfield innings and position. Innings help account
+for playing time, although they do not tell us how difficult a player's chances
+were. To check a model, the code leaves one player out, fits it on everyone else,
+and predicts that player. Then it repeats for the others. RMSE gives more weight
+to large misses; MAE is the average size of a miss. Both scores are in runs, and
+lower is better.
+
+```{r range}
+# comparing prediction errors for the range models
+knitr::kable(models |> filter(family=='range') |> select(model,players,loocv_rmse,loocv_mae),digits=3)
+knitr::kable(components |> select(model,players,loocv_rmse,loocv_mae),digits=3)
+include_plot('figures/09_jump_component_comparison.png')
+```
+
+Jump helped explain range more than sprint speed alone did. Burst had the best
+score among the individual movement components, but its small advantage over
+Jump does not prove it is always better. Reaction and Route had a correlation of
+about −0.85, so their separate effects are hard to untangle when both are in the
+model. The models use either overall Jump or its components, not both together.
+
+These comparisons were explored after looking at the data. Testing several
+models can make the best-looking result seem stronger than it really is, even
+with cross-validation. The analysis does not include an uncertainty interval for
+the difference between model errors or a test on another season.
+
+# Throwing value
+
+These models use the corrected 2025 outfield arm-strength data. They include
+advancement opportunities and position before adding strength. The comparison
+using overall arm strength keeps the same players so that changing the sample
+does not also change the comparison.
+
+```{r arm}
+# comparing prediction errors for the arm models
+knitr::kable(models |> filter(family=='arm') |> select(model,players,loocv_rmse,loocv_mae),digits=3)
+include_plot('figures/03_arm_value.png')
+```
+
+Savant's throwing-value calculation already uses throwing arm among its inputs.
+That means the two measurements are connected by design. A model coefficient
+shows a relationship after accounting for the other included variables; it does
+not tell us how many runs a player would gain by training to throw harder.
+
+# Runner attempts
+
+The runner-attempt models use the number of attempts and non-attempts. This keeps
+track of how many opportunities each player's rate is based on. Both models
+include position, and the second adds outfield arm strength. This type of model
+is called quasibinomial. It allows the variation in the counts to differ from a
+standard binomial model. The arm-strength effect is assumed to be the same across
+position groups.
+
+```{r attempts}
+# showing the runner-attempt model results
+knitr::kable(attempts |> mutate(across(c(player_rate_rmse,player_rate_mae),~100*.x)),digits=5,
+ caption='Player-rate RMSE and MAE are percentage points; event scores are unitless.')
+knitr::kable(odds,digits=3)
+include_plot('figures/11_runner_attempts.png')
+```
+
+The odds ratio describes the estimated change in odds for 5 more mph of arm
+strength. It is not a percentage-point change in attempt rate, and its interval
+depends on this model's assumptions. Runner speed, ball location, bases and outs,
+parks, and other play details are not included. The score differences are too
+small to conclude that arm strength meaningfully improved prediction. Giving
+each player equal weight and giving each opportunity equal weight answer slightly
+different questions.
+
+# Range versus arm on the same players
+
+```{r dispersion}
+# comparing the spread of range and arm runs
+knitr::kable(disp |> filter(scale=='season_totals'),digits=3)
+include_plot('figures/05_range_vs_arm.png')
+include_plot('figures/12_dispersion_uncertainty.png')
+```
+
+Total measured runs equal range runs plus arm runs. The spread of that total
+also depends on whether the two components tend to move together. In statistical
+terms: Var(T) = Var(R) + Var(A) + 2 Cov(R,A). That is why the table includes
+covariance. A larger range spread does not mean every player gets more value
+from range or that range is worth a fixed multiple of throwing. Position groups
+use each player's full-season outfield values, including work at other positions.
+
+To estimate uncertainty in the spread, the code repeatedly samples players with
+replacement 2,000 times within each group. It keeps a player's range and arm
+values together. This is called a paired bootstrap. The intervals describe
+uncertainty within this selected sample. They do not account for every measurement
+problem, missing player, qualification rule, or change from season to season.
+
+# Checking whether the findings held up
+
+```{r sensitivity}
+# showing whether the results hold up under different sample rules
+knitr::kable(read_table('sensitivity/component_dispersion.csv'),digits=3)
+knitr::kable(read_table('sensitivity/influence_summary.csv'),digits=5)
+include_plot('figures/07_model_residuals.png')
+include_plot('figures/08_model_qq.png')
+```
+
+I checked whether the position rule changed the results by using 50%, 60%, and
+70% cutoffs. Players stay in the overall models while their labels may change.
+The position-specific comparisons require the chosen share of innings.
+
+The code also flags players who have a large effect on a fitted model, using
+Cook's distance greater than 4/n, where n is the sample size. It then repeats the
+analysis without each flagged player and without all of them together. Competing
+models still use the same players in each check. These are ways to test the
+findings, not reasons to delete players just because the results look better
+without them. The checks change one choice at a time.
+
+Range still had a larger spread after removing each of the 107 players one at
+a time. Other checks compared runs per 1,000 innings and the values left after
+accounting for innings with a linear model. Neither approach fully accounts for
+different defensive opportunities. Some unusually large model errors remained.
+The saved linear-model results include HC3 standard errors, which allow for
+unequal error variation. No player was automatically removed for being influential.
+
+# What this means for baseball
+
+## Completing the original position question
+
+The original question also asked whether the balance changes between LF, CF,
+and RF. The extension compares the spread of range and arm runs per 450 innings
+and directly estimates differences between positions. It uses the existing
+60% position rule without a new innings minimum as its primary sample.
+
+```{r position_extension}
+# comparing the range and arm balance at each position
+balance <- read_table('original_questions/position_balance.csv')
+contrasts <- read_table('original_questions/position_contrasts.csv')
+knitr::kable(balance |> filter(scenario %in% c('primary','minimum_450')) |>
+ select(scenario,position,players,range_sd,arm_sd,sd_ratio),digits=3)
+knitr::kable(contrasts |> filter(scenario=='primary') |>
+ select(contrast,balance_ratio,lower_95,upper_95,lower_family,upper_family),digits=3)
+include_plot('figures/13_position_balance.png')
+```
+
+The ratio is range standard deviation divided by arm standard deviation. Values
+above 1 mean range varies more; they are not value multipliers. In the primary
+sample, the ratio is 3.82 in CF, 2.18 in LF, and 1.95 in RF. The CF/RF contrast
+is 1.96, with a 95% interval of 1.03–3.49. A wider interval that accounts for the
+three planned comparisons is 0.90–3.96, which includes no difference.
+
+With a 450-inning minimum, the CF/RF contrast shrinks to 1.14. This makes the
+position hierarchy uncertain. It does not mean positions are equivalent.
+Range has the larger point-estimate spread in every scenario; the 900-inning LF
+sample is small enough that its interval includes equal spreads.
+
+The extension uses 5,000 paired-player bootstrap draws within each position.
+The three contrast intervals use a 98.33% percentile interval as an approximate
+Bonferroni adjustment. Uncertainty remains conditional on the selected players;
+the data do not isolate the effect of changing a player's position.
+
+## Position interactions and arm-strength curvature
+
+An interaction allows a skill's relationship with the outcome to differ by
+position. These comparisons use the same LF/CF/RF players for every model within
+each question: 77 for range and 98 for arm value and runner attempts.
+
+```{r interaction_extension}
+# showing whether separate relationships by position improve predictions
+knitr::kable(read_table('original_questions/interaction_scores.csv') |>
+ filter(scenario=='primary',group=='Overall') |>
+ mutate(rmse=if_else(family=='attempts',100*rmse,rmse),
+        units=if_else(family=='attempts','percentage points','runs')) |>
+ select(family,model,players,rmse,units),digits=3)
+knitr::kable(read_table('original_questions/arm_curvature_scores.csv') |>
+ filter(group=='Overall') |> select(model,players,rmse,mae),digits=3)
+```
+
+Position improved the Jump model modestly, but separate position slopes did not
+improve range or arm-value RMSE over shared slopes. Separate slopes made a small
+improvement for runner attempts. The RF strength–attempt slope was negative,
+but its interval adjusted for checking three position slopes included zero.
+This is tentative evidence rather than a strong deterrence result.
+
+The quadratic arm model reduced RMSE from 1.912 to 1.907 runs. That is too small
+an improvement to establish a useful velocity threshold. A quadratic check does
+not test every possible nonlinear relationship.
+
+## What this means for choosing a player
+
+At equal exposure, a one-run range advantage offsets a one-run arm disadvantage.
+It is the size of both differences that matters. Among CFs with at least 450
+innings, Victor Scott II's range advantage over Brenton Doyle was 3.97 runs per
+450 innings and his arm disadvantage was 3.36, leaving him 0.61 ahead overall.
+Michael Harris II's range advantage over Doyle was only 0.19, against an arm
+disadvantage of 2.42, leaving him 2.23 behind. These are observed 2025 rates,
+not predictions of who would be the better future acquisition.
+
+The hold, advance, and thrown-out components reconcile to arm runs for all 118
+players. The data can credit holds without a recorded out, but do not establish
+that arm strength caused those holds. For example, Michael Harris II had about
++5.40 hold runs and −6.39 advance runs, with zero recorded outs in the tracked
+advancement data, for about −0.99 total arm runs.
+
+A question-by-question explanation is saved in
+`reports/original_questions_answered.md`, and all extension outputs are in
+`data/processed/original_questions/`. The extension was specified after the
+initial findings and remains exploratory.
+
+## Overall interpretation
+
+The baseball takeaway is to look at how an outfielder moves toward the ball,
+not just how fast he can run. Throwing needs its own outcome because OAA measures
+range. This project does not establish that a right fielder's arm has a larger
+causal value than a left fielder's, tell a player how to train, or provide enough
+evidence for an acquisition decision.
+
+The project can be rerun from the saved 2025 data. A next step would be to add
+another season and more detail about the plays each player faced. That would
+help test whether the relationships hold up outside this sample.
+
+# Sources
+
+- [Baseball Savant OAA](https://baseballsavant.mlb.com/leaderboard/outs_above_average)
+- [Outfielder Jump](https://baseballsavant.mlb.com/jump)
+- [Arm Strength](https://baseballsavant.mlb.com/leaderboard/arm-strength)
+- [Arm Value](https://baseballsavant.mlb.com/leaderboard/baserunning?type=Fld)
+- [Sprint Speed](https://baseballsavant.mlb.com/leaderboard/sprint_speed)
+- [FanGraphs fielding leaderboards](https://www.fangraphs.com/leaders/major-league?stats=fld&season=2025&season1=2025)
+
+Exact verification URLs and extracted public source records are saved in
+`docs/verification`. Original source hashes are in `docs/source_manifest.csv`.
+
+# Validation
+
+```{r checks}
+# showing the saved validation checks
+knitr::kable(read_table('final/validation.csv'))
+```

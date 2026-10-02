@@ -1,0 +1,10 @@
+project_filename,original_filename,sha256,intended_season,season_evidence
+arm_strength.csv,arm_strength.csv,37c2a9688496630db2bedd3fd422574a6032c7f16f915b7825ba612ab5d3dbef,2025,prior discussion / export settings; not encoded in CSV
+arm_value.csv,arm_value.csv,1cec6b6b748cff40f3cd184f63d5bb1fb53392f7e8d206d0f8549599543be913,2025,year column
+outfield_jump.csv,outfield_jump.csv,df06354f59b11758c410f11cd193abc8309cefa6c851aeee58701d643186e035,2025,year column
+outs_above_average.csv,outs_above_average.csv,553ebfee6abc8393172520dacaae0cea21f2e74bf01f9d20f72c842b33328301,2025,year column
+sprint_speed.csv,sprint_speed (1).csv,660e085ae336fd6b123cc5b71f4ed95417d55af506eeb165e35f9a9bf0dac497,2025,prior discussion / export settings; not encoded in CSV
+lf_2025.csv,lf_2025.csv,cdd2f1640a517de3e0b321a9a4f010e48d90450047a413074470d8647fc14780,2025,prior discussion / export settings; not encoded in CSV
+cf_2025.csv,cf_2025.csv,a9862b93aea32eae33b6d9671d62c4dd6a03207177584f403c43194495cf9774,2025,prior discussion / export settings; not encoded in CSV
+rf_2025.csv,rf_2025.csv,3ad94bfc247a686960f2ae184b766c2222a37cdb52b969ca31894468b9538105,2025,prior discussion / export settings; not encoded in CSV
+arm_strength_2025_verified.csv,Official 2025 Arm Strength embedded leaderboard JSON,1a89f48417a540f13e3072b3984a83a7e6ab0dd6a2a1de61cfc7b3f4ea03731c,2025,year=2025 in every source record; checked 2026-10-01
