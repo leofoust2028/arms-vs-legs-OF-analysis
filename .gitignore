@@ -17,3 +17,13 @@ docs/project_context.md
 # Personal study notes stay on this computer.
 reports/project_walkthrough*
 docs/learning_guide.md
+
+# Rebuild these outputs locally with run_all.R.
+/data/processed/
+/figures/*
+!/figures/09_jump_component_comparison.png
+!/figures/13_position_balance.png
+/reports/*
+!/reports/final_report.Rmd
+!/reports/combined_runs_leaderboard.md
+!/reports/runs_per_450_leaderboard.md

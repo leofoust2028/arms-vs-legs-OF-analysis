@@ -87,7 +87,6 @@ lines <- c(
  '**Range was the bigger separator in this 2025 sample, including within LF, CF, and RF. Jump and Burst helped explain range better than raw speed alone. Arm strength helped explain throwing value, but strong causal deterrence was not established. The evidence is not robust enough to claim a fixed position hierarchy, and the better player depends on the size of both component advantages.**', '',
  'The original questions are now covered as an exploratory analysis of the available data. Establishing future player value, causal effects, or the effect of switching positions would require additional evidence, especially more seasons and play-level context.', '',
  '## Evidence and reproducibility', '',
- '- [Extension design](../docs/final_questions_plan.md)',
  '- [Analysis code](../R/11_original_questions.R)',
  '- [Generated answer code](../R/12_question_answers.R)',
  '- [All extension tables](../data/processed/original_questions/)',

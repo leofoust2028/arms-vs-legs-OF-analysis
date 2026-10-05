@@ -1,5 +1,5 @@
 # Finish the original position and arm-shape questions on saved 2025 data.
-# Design and interpretation limits: docs/final_questions_plan.md.
+# Exploratory follow-up using the saved 2025 samples; see the README for limits.
 library(tidyverse)
 s <- readRDS('data/processed/samples/analysis_samples.rds')
 out <- 'data/processed/original_questions'

@@ -9,14 +9,6 @@ A strong throw from the outfield is easy to notice, but getting to a ball in the
 
 Using 2025 MLB data, I compared range and arm runs, looked at the differences between LF, CF, and RF, and tested whether speed, Jump, and arm strength helped explain defensive results. I also made leaderboards for season totals and runs per 450 innings, the equivalent of 50 full games in the field.
 
-## Research Questions
-
-1. Does range separate outfielders more than throwing ability does?
-2. Does that balance change between left, center, and right field?
-3. Does Jump explain range better than sprint speed alone?
-4. Does throwing harder lead to better arm results, and is there a point where extra velocity matters more?
-5. Do runners attempt to advance less often against stronger arms?
-
 ## Main Findings
 
 ### Range made the bigger difference between players
@@ -51,27 +43,15 @@ Stronger arms also did not meaningfully improve predictions of how often runners
 
 ## Data and Methods
 
-### Data preparation
+I joined **2025 Baseball Savant** range runs, arm runs, Sprint Speed, Jump, and Arm Strength with **FanGraphs outfield innings**, using player IDs. I checked missing values and seasons, converted innings to outs before adding them, and assigned a main position when a player spent at least 60% of his outfield innings there.
 
-I used **2025 Baseball Savant data** for range runs, arm runs, Sprint Speed, Jump, and Arm Strength, plus **FanGraphs outfield innings**. Range and arm runs are both measured above average, so they can be compared and added on the same scale.
+The samples included **107 players** for range versus arm, **92** for movement models, and **118** for throwing models. Competing models within each question used the same players.
 
-I joined the files by player ID and checked seasons, missing values, and playing time. Players were assigned a main position if at least 60% of their outfield innings came there; the rest were grouped as multi-position.
+I used **multiple linear regression** to compare skill measurements while accounting for innings or advancement opportunities and position. A **quasibinomial model** compared runner attempts with non-attempts, accounting for the number of opportunities behind each player's rate.
 
-The samples included **107 players** for the range-versus-arm comparison, **92** for the movement models, and **118** for the throwing models. These differ because not every player had every measurement. Competing models within each question used the same players.
+I tested predictions by leaving one player out, fitting the model on everyone else, and predicting that player's result. **RMSE (root mean squared error)** squares those prediction errors, averages them, and takes the square root. Lower is better, and large misses count more heavily. Range and arm scores are measured in runs. These are within-season predictions, not future forecasts.
 
-### Models and prediction error
-
-I used **multiple linear regression** to examine how several measurements together related to defensive runs. The range baseline included innings and position; the arm baseline included advancement opportunities and position. I then added speed, Jump, or arm strength to see whether predictions improved.
-
-For runner attempts, I used a **quasibinomial model**, which compares attempts with non-attempts while accounting for the number of opportunities behind each player's rate.
-
-I tested predictions with **leave-one-player-out cross-validation**: leave one player out, fit the model on everyone else, predict the player left out, and repeat.
-
-The main score was **RMSE (root mean squared error)**. It squares the prediction errors, averages them, and takes the square root. Lower is better, and larger misses count more heavily. For the range and arm models, the score is measured in runs. These are predictions for held-out players within 2025, not forecasts for future seasons.
-
-### Checking the results
-
-I checked different playing-time requirements, position cutoffs, and the effect of removing individual players. I also used **bootstrap sampling**, repeatedly resampling players to estimate uncertainty. The position comparison used rates per 450 innings and wider uncertainty intervals to account for comparing three pairs of positions.
+I checked different position cutoffs, innings minimums, and individual-player exclusions. **Bootstrap sampling**, repeatedly resampling players, helped estimate uncertainty in the range and arm comparisons.
 
 ## Takeaways and Limitations
 
@@ -86,5 +66,7 @@ A season check caught a problem with the original arm-strength file. I replaced 
 - [R scripts](R/)
 - [Season leaderboard](reports/combined_runs_leaderboard.md)
 - [Leaderboard per 450 innings](reports/runs_per_450_leaderboard.md)
+
+Intermediate tables, saved models, and the full report are generated locally by the code. The repository keeps the main charts and leaderboards.
 
 *Source data remain subject to their providers' terms.*

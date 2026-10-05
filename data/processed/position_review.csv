@@ -1,4 +1,0 @@
-mlbam_id,player_name,outs_LF,outs_CF,outs_RF,in_source_LF,in_source_CF,in_source_RF,total_of_outs,most_position_outs,primary_share,tied_most_played,most_played_position,position_group,position_comparison_eligible
-621035,Chris Taylor,237,202,237,TRUE,TRUE,TRUE,676,237,0.3505917159763314,TRUE,NA,Multi-position OF,FALSE
-665828,Oswaldo Cabrera,3,0,3,TRUE,FALSE,TRUE,6,3,0.5,TRUE,NA,Multi-position OF,FALSE
-688363,Graham Pauley,0,0,0,FALSE,TRUE,FALSE,0,0,NA,FALSE,NA,No OF innings,FALSE
